@@ -25,23 +25,17 @@ public class CraftMovement : MonoBehaviour
         AdjustHeightAndTilt();
 
         // Movement - forward and backward
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetButton("Vertical"))
         {
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            transform.Translate(Vector3.back * speed * Time.deltaTime);
+            Vector3 vec = new Vector3(0, 0, Input.GetAxisRaw("Vertical"));
+            transform.Translate(vec * speed * Time.deltaTime);
         }
 
         // Turning the hovercraft left and right
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetButton("Horizontal"))
         {
-            transform.Rotate(Vector3.up, -turnSpeed * Time.deltaTime);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            transform.Rotate(Vector3.up, turnSpeed * Time.deltaTime);
+            Vector3 vec = new Vector3(0, Input.GetAxisRaw("Horizontal") , 0);
+            transform.Rotate(vec, turnSpeed * Time.deltaTime);
         }
 
         // Camera follow logic
