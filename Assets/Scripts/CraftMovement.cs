@@ -18,12 +18,21 @@ public class CraftMovement : MonoBehaviour
     private float originalY;
     private float timeOffset;
 
+    private AudioSource craftAudioSource;
+    private float accelerationIntensity = 0f;
+
     void Start()
     {
         // Assign the active terrain to the terrain variable
         terrain = Terrain.activeTerrain;
         originalY = transform.position.y;
         timeOffset = Random.Range(0f, 100f);
+
+        craftAudioSource = GetComponent<AudioSource>();
+        if (craftAudioSource == null)
+        {
+            Debug.LogWarning("Missing AudioSource component on the craft.");
+        }
     }
 
     void Update()
@@ -54,6 +63,8 @@ public class CraftMovement : MonoBehaviour
         }
 
         HoverEffect();
+        HandleAccelerationInput();
+        AdjustCraftSound();
     }
 
     void AdjustHeightAndTilt()
@@ -88,4 +99,42 @@ public class CraftMovement : MonoBehaviour
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, tiltZ);
         }
     }
+
+    void HandleAccelerationInput()
+    {
+        bool isAccelerating = false;
+
+        // Check if 'W' or 'S' is being pressed for forward or backward acceleration
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
+        {
+            isAccelerating = true;
+            accelerationIntensity = Mathf.Clamp(accelerationIntensity + Time.deltaTime, 0f, 1f);
+        }
+
+        // Check if 'A' or 'D' is being pressed for sideways acceleration
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+        {
+            isAccelerating = true;
+            // For sideways, you might want to adjust intensity differently or keep it the same
+            accelerationIntensity = Mathf.Clamp(accelerationIntensity + Time.deltaTime, 0f, 1f);
+        }
+
+        // If no relevant keys are pressed, gradually reduce acceleration intensity
+        if (!isAccelerating)
+        {
+            accelerationIntensity = Mathf.MoveTowards(accelerationIntensity, 0f, Time.deltaTime);
+        }
+    }
+
+    void AdjustCraftSound()
+    {
+        if (craftAudioSource != null)
+        {
+            // Adjust the pitch based on accelerationIntensity
+            craftAudioSource.pitch = 1 + accelerationIntensity * 0.5f; // Example scaling
+
+            // Optionally adjust volume or other parameters similarly
+        }
+    }
+
 }
